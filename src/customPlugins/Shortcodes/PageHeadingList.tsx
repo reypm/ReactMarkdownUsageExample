@@ -1,56 +1,56 @@
-const processPageHeadingList = (node: any) => {
-    const attrs = node.attributes;
-    const minLevel = attrs['min-level'];
-    const maxLevel = attrs['max-level'];
+import {ContainerDirective, LeafDirective} from "mdast-util-directive";
+import {toc} from "mdast-util-toc";
 
-    node.children.splice(1, 0, {
-        type: 'containerDirective',
-        children: [],
-        data: {
-            hName: 'div',
-            hProperties: {
-                class: node.name + '-content'
-            }
+const processPageHeadingList = (
+    node: ContainerDirective | LeafDirective,
+    index: number,
+    parent: any
+) => {
+    let minLevel: number = 1;
+    let maxLevel: number = 6;
+    const hasAttributes = node.hasOwnProperty('attributes');
+
+    if (hasAttributes) {
+        if (node.attributes?.["min-level"] !== undefined && node.attributes?.["min-level"] !== null) {
+            minLevel = parseInt(node.attributes?.["min-level"]);
         }
-    });
 
-    const elements = node.children;
+        if (node.attributes?.["max-level"] !== undefined && node.attributes?.["max-level"] !== null) {
+            maxLevel = parseInt(node.attributes?.["max-level"]);
+        }
+    }
+
+    node.data = node.data ?? {};
+    node.data.hName = "nav";
+    node.data.hProperties = {
+        className: "page-heading-list",
+        ariaLabel: "Page heading list"
+    };
+
+    const parentChildren = parent.children;
     let headings: any = [];
 
-    elements.map((element: any) => {
-        if (element.type === 'heading' && element.depth <= maxLevel && element.depth >= minLevel) {
-            const listItemValue = element.children[0].hasOwnProperty('children')
-                ? element.children[0].children[0].value
-                : element.children[0].value;
-
-            const headingListItem = {
-                type: 'listitem',
-                children: [
-                    {
-                        type: 'text',
-                        value: listItemValue
-                    }
-                ],
-                data: {
-                    name: 'li'
-                }
-            }
-
-            headings.push(headingListItem)
+    // eslint-disable-next-line array-callback-return
+    parentChildren.map((element: any) => {
+        if (
+            element.type === "heading" &&
+            element.depth <= maxLevel &&
+            element.depth >= minLevel
+        ) {
+            headings.push(element);
         }
     });
 
-    node.children.unshift({
-        type: 'list',
-        children: headings,
-        data: {
-            hName: 'ul'
-        }
-    })
+    const tree: import("mdast").Root = {
+        type: "root",
+        children: headings
+    };
 
-    node.data.hName = 'nav'
-    node.data.hProperties.class = 'page-heading-list'
-    node.data.hProperties.ariaLabel = 'Page Heading List'
-}
+    const table = toc(tree, {tight: true});
+
+    if (table !== undefined && table.hasOwnProperty('map') && table.map !== undefined) {
+        parent.children.splice(index, 1, table.map);
+    }
+};
 
 export default processPageHeadingList;

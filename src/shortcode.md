@@ -1,35 +1,11 @@
-# This is notice test
+::page-heading-list[In this section]{min-level=1 max-level=3}
 
-:::notice{note}
-This is a note notice!
-:::
+# Alpha
 
-:::image{id="200x100/000/fff&text=this+is+a+text"}
-:::
+## Table of contents
 
-# Page Heading List Shortcode Example
+## Bravo
 
-## This is a level 2 heading
+### Charlie
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-aliqua.
-
-## This is a level 2 heading
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-aliqua.
-
-### This is a level 3 heading
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-aliqua.
-
-### This is a level 3 heading
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-aliqua.
-
-## This is a level 2 heading
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-aliqua.
+## Delta

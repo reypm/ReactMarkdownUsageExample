@@ -1,47 +1,84 @@
-const processNotice = (node: any) => {
-    const allowedTypes = ['warning', 'important', 'note', 'tip', 'info'];
-    const currentType = Object.keys(node.attributes)[0];
+import {Html, Paragraph, RootContent, Text} from "mdast";
+import {toHast} from "mdast-util-to-hast";
+import {toHtml} from "hast-util-to-html";
 
-    if (allowedTypes.indexOf(currentType) === -1) {
-        throw new Error('Invalid notice type: ' + currentType);
+const processNotice = (node: any, index: number, parent: any, file: any) => {
+    const allowedTypes = ['warning', 'important', 'note', 'tip', 'info'];
+    const firstElementKey = Object.keys(node.attributes)[0];
+
+    let currentType;
+
+    // Require a `type` attribute, crash otherwise.
+    if (Object.hasOwn(node.attributes, 'title')) {
+        currentType = node.attributes.title;
+    } else if (allowedTypes.indexOf(firstElementKey)) {
+        currentType = firstElementKey;
+    } else {
+        file.fail("Expected `type` attribute on notice directive", node);
     }
 
-    node.children.unshift({
-        type: 'containerDirective',
-        children: [
-            {
-                type: 'svg',
-                data: {
-                    hName: 'svg',
-                    hProperties: {
-                        class: node.name + '-icon',
-                        variant: currentType
-                    }
-                }
-            },
-            {
-                type: 'paragraph',
-                children: [
-                    {
-                        type: 'text',
-                        value: 'some'
-                    }
-                ]
-            }
-        ],
-        data: {
-            hName: 'div',
-            hProperties: {
-                class: node.name + '-title'
-            }
-        }
-    });
+    console.log('node', node)
 
-    node.children[1].children.push(...node.children.splice(2))
+    const content: Text = {
+        type: 'text',
+        value: 'Alpha bravo charlie.'
+    };
 
-    delete node.data.hProperties.title
-    node.data.hName = 'div'
-    node.data.hProperties = 'sc-notice' + currentType;
+    const div: Html = {
+        type: "html",
+        value: "<div>"
+    };
+
+    const paragraph: Paragraph = {
+        type: "paragraph",
+        children: [div, content]
+    };
+
+    // You also don’t want to *add* it to the directive, you want to *replace* the directive.
+    const siblings: RootContent[] = parent.children;
+    siblings.splice(index, 1, paragraph);
+
+    const hast = toHast(node);
+    const html = toHtml(hast)
+
+    console.log(html)
+
+    // node.children.unshift({
+    //     type: 'containerDirective',
+    //     children: [
+    //         {
+    //             type: 'svg',
+    //             data: {
+    //                 hName: 'svg',
+    //                 hProperties: {
+    //                     class: node.name + '-icon',
+    //                     variant: currentType
+    //                 }
+    //             }
+    //         },
+    //         {
+    //             type: 'paragraph',
+    //             children: [
+    //                 {
+    //                     type: 'text',
+    //                     value: 'some'
+    //                 }
+    //             ]
+    //         }
+    //     ],
+    //     data: {
+    //         hName: 'div',
+    //         hProperties: {
+    //             class: node.name + '-title'
+    //         }
+    //     }
+    // });
+    //
+    // node.children[1].children.push(...node.children.splice(2))
+    //
+    // delete node.data.hProperties.title
+    // node.data.hName = 'div'
+    // node.data.hProperties = 'sc-notice' + currentType;
 }
 
 export default processNotice;

@@ -1,16 +1,9 @@
 import React, {useState} from 'react';
 import './App.css';
 import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import remarkDirective from "remark-directive";
-import remarkFrontmatter from "remark-frontmatter";
-import remarkBreaks from "remark-breaks";
-import remarkUnwrapImages from "remark-unwrap-images";
+import myRemarkShortcodePlugin from "./customPlugins/myRemarkShortcodePlugin";
 import rehypeSlug from "rehype-slug";
-import rehypeExternalLinks from "rehype-external-links";
-import shortcodePlugin from "./customPlugins/ShortcodePlugin";
-
-const imgLinks = require("@pondorasti/remark-img-links")
 
 function App() {
     const readmePath = require("./shortcode.md");
@@ -28,17 +21,11 @@ function App() {
         <div className="App">
             <ReactMarkdown
                 remarkPlugins={[
-                    remarkGfm,
                     remarkDirective,
-                    [remarkFrontmatter, ['yaml', 'toml']],
-                    remarkBreaks,
-                    remarkUnwrapImages,
-                    shortcodePlugin,
-                    [imgLinks, {absolutePath: "https://dummyimage.com/"}]
+                    myRemarkShortcodePlugin,
                 ]}
                 rehypePlugins={[
-                    rehypeSlug,
-                    rehypeExternalLinks
+                    rehypeSlug
                 ]}
             >
                 {shortcodeContent}
